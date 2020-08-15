@@ -17,6 +17,7 @@ from rooibos.statistics.models import Activity
 import re
 import logging
 
+from rooibos.util import validate_next_link
 
 logger = logging.getLogger(__name__)
 
@@ -59,8 +60,10 @@ def logout(request, *args, **kwargs):
                                   {},
                                   context_instance=RequestContext(request))
     else:
-        kwargs['next_page'] = request.GET.get(
-            'next', kwargs.get('next_page', settings.LOGOUT_URL))
+        kwargs['next_page'] = validate_next_link(
+            request.GET.get('next'),
+            kwargs.get('next_page', settings.LOGOUT_URL)
+        )
         return dj_logout(request, *args, **kwargs)
 
 

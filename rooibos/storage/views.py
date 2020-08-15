@@ -29,7 +29,7 @@ from rooibos.data.models import Collection, Record, FieldValue, \
 from rooibos.storage import get_media_for_record, get_image_for_record, \
     get_thumbnail_for_record, analyze_media, analyze_records, \
     find_record_by_identifier
-from rooibos.util import json_view
+from rooibos.util import json_view, validate_next_link
 from rooibos.statistics.models import Activity
 from .lorisgateway import handle_loris_request
 import logging
@@ -228,8 +228,8 @@ def media_upload(request, recordid, record):
                     messages.INFO,
                     message="The uploaded file is too large."
                 )
-                return HttpResponseRedirect(
-                    request.GET.get('next', reverse('main')))
+                return HttpResponseRedirect(validate_next_link(
+                    request.GET.get('next'), reverse('main')))
 
             media = Media.objects.create(record=record,
                                          name=os.path.splitext(file.name)[0],
@@ -237,8 +237,8 @@ def media_upload(request, recordid, record):
                                          mimetype=mimetype)
             media.save_file(file.name, file)
 
-            return HttpResponseRedirect(
-                request.GET.get('next', reverse('main')))
+            return HttpResponseRedirect(validate_next_link(
+                request.GET.get('next'), reverse('main')))
         else:
             # Invalid form submission
             raise Http404()
@@ -253,7 +253,7 @@ def media_delete(request, mediaid, medianame):
         raise Http404()
     if request.method == 'POST':
         media.delete()
-        return HttpResponseRedirect(request.GET.get('next', '.'))
+        return HttpResponseRedirect(validate_next_link(request.GET.get('next'), '.'))
     else:
         return HttpResponseNotAllowed(['POST'])
 
@@ -608,7 +608,8 @@ def import_files(request):
                 messages.INFO,
                 message=result
             )
-            next = request.GET.get('next', request.get_full_path())
+            next = validate_next_link(
+                request.GET.get('next'), request.get_full_path())
             return HttpResponseRedirect(next)
 
         else:

@@ -29,6 +29,7 @@ import zipfile
 import os
 import logging
 
+from rooibos.util import validate_next_link
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +72,8 @@ class PresentationViewer(Viewer):
     weight = 100
 
     def view(self, request):
-        return_url = request.GET.get('next', reverse('presentation-browse'))
+        return_url = validate_next_link(
+            request.GET.get('next'), reverse('presentation-browse'))
         manifest_url = reverse(
             'presentation-manifest', args=(self.obj.id, self.obj.name))
         return render_to_response(
@@ -106,7 +108,8 @@ class PresentationViewerOld(Viewer):
     weight = 99
 
     def view(self, request):
-        return_url = request.GET.get('next', reverse('presentation-browse'))
+        return_url = validate_next_link(
+            request.GET.get('next'), reverse('presentation-browse'))
         return render_to_response(
             'presentation_viewer_old.html',
             {
