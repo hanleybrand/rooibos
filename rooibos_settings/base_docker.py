@@ -4,7 +4,7 @@
 import os
 import sys
 import re
-from ConfigParser import RawConfigParser
+from configparser import RawConfigParser
 
 
 install_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '..'))
